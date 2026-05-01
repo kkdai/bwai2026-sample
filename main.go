@@ -45,8 +45,6 @@ var (
 const (
 	stateCollection = "oauth_states"
 	tokenCollection        = "user_tokens"
-	richMenuConnect        = "richmenu-8360de4ffc27c9eba7849980675ae7f3"
-	richMenuMain           = "richmenu-94cf1a33f7ddd92e65d40d5964070806"
 )
 
 func main() {
@@ -582,9 +580,6 @@ func main() {
 				case webhook.FollowEvent:
 					if s, ok := e.Source.(*webhook.UserSource); ok {
 						log.Printf("Follow event for user: %s", s.UserId)
-						if _, err := bot.LinkRichMenuIdToUser(s.UserId, richMenuConnect); err != nil {
-							log.Printf("Failed to link rich menu for new user %s: %v", s.UserId, err)
-						}
 					}
                 case webhook.BeaconEvent:
                     if s, ok := e.Source.(*webhook.UserSource); ok {
@@ -659,16 +654,6 @@ func oauthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Failed to save token to firestore: %v", err)
 		http.Error(w, "Failed to save token.", http.StatusInternalServerError)
 		return
-	}
-
-	// 4. Link the main rich menu to the user
-	richMenuSwitcher, err := messaging_api.NewMessagingApiAPI(os.Getenv("ChannelAccessToken"))
-	if err != nil {
-		log.Printf("Failed to create messaging api client for rich menu linking: %v", err)
-	} else {
-		if _, err := richMenuSwitcher.LinkRichMenuIdToUser(userID, richMenuMain); err != nil {
-			log.Printf("Failed to link rich menu for user %s: %v", userID, err)
-		}
 	}
 
 	log.Printf("Successfully saved token for user %s", userID)
@@ -893,16 +878,6 @@ func revokeGoogleToken(ctx context.Context, userID string) error {
 	if _, err := docRef.Delete(ctx); err != nil {
 		log.Printf("CRITICAL: Failed to delete token for user %s from Firestore after revocation attempt: %v", userID, err)
 		return fmt.Errorf("failed to delete token from firestore: %w", err)
-	}
-
-	// 4. Link the connect rich menu back to the user
-	richMenuSwitcher, err := messaging_api.NewMessagingApiAPI(os.Getenv("ChannelAccessToken"))
-	if err != nil {
-		log.Printf("Failed to create messaging api client for rich menu linking: %v", err)
-	} else {
-		if _, err := richMenuSwitcher.LinkRichMenuIdToUser(userID, richMenuConnect); err != nil {
-			log.Printf("Failed to link rich menu for user %s: %v", userID, err)
-		}
 	}
 
 	log.Printf("Successfully revoked and/or deleted token for user %s", userID)
