@@ -26,67 +26,75 @@
 2.  安裝並設定好 [Google Cloud SDK (gcloud CLI)](https://cloud.google.com/sdk/docs/install)。
 3.  一個 LINE Bot 頻道，並取得 **Channel Secret** 和 **Channel Access Token**。
 
-### 部署步驟
+### 部署步驟 (使用 Gemini CLI 與 gcloud)
 
-1.  **啟用必要的 API**
+本專案支援使用 **Gemini CLI** 搭配 **gcloud** 進行自動化部署。以下是本次部署的詳細流程：
 
-    在您的 Google Cloud 專案中，啟用以下服務：
-    *   **Cloud Run API**
-    *   **Cloud Build API** (用於自動建置容器映像檔)
-    *   **Firestore API** (用於儲存使用者授權資料)
+#### 1. 初始化與環境檢查
+首先，確保您已安裝 `gcloud` 並完成登入。
 
-    您可以使用 gcloud CLI 快速啟用：
-    ```bash
-    gcloud services enable run.googleapis.com cloudbuild.googleapis.com firestore.googleapis.com
-    ```
+```bash
+# 檢查當前 gcloud 設定
+gcloud config get-value project
+gcloud config get-value compute/region
+```
 
-2.  **建立 Firestore 資料庫**
+#### 2. 設定專案與啟用服務
+若尚未啟用必要服務，請執行以下指令。這會啟用 Cloud Run、Cloud Build、Firestore 與 Artifact Registry。
 
-    *   前往 Google Cloud Console 的 Firestore 頁面。
-    *   選擇「原生模式 (Native mode)」。
-    *   選擇離您使用者最近的地區，然後建立資料庫。
+```bash
+# 設定目標專案
+gcloud config set project [YOUR_PROJECT_ID]
 
-3.  **取得 Google OAuth 憑證**
+# 啟用必要 API
+gcloud services enable firestore.googleapis.com \
+  cloudbuild.googleapis.com \
+  run.googleapis.com \
+  artifactregistry.googleapis.com
+```
 
-    這是讓您的機器人能代表使用者存取 Google Drive 的關鍵。
-    *   前往 [Google Cloud Console -> APIs & Services -> Credentials](https://console.cloud.google.com/apis/credentials)。
-    *   點擊 **+ CREATE CREDENTIALS**，選擇 **OAuth client ID**。
-    *   在 **Application type** 中選擇 **Web application**。
-    *   給它一個名稱，例如 "LINE Bot File Uploader"。
-    *   **此步驟先不要填寫 Authorized redirect URIs**，我們先留空，等 Cloud Run 部署完成後再回來設定。
-    *   建立後，您會得到一組 **Client ID** 和 **Client Secret**。請妥善保管，稍後會用到。
+#### 3. 建立 Firestore 資料庫
+Firestore 用於儲存使用者 OAuth 權限，必須使用 Native 模式：
 
-4.  **部署到 Cloud Run**
+```bash
+gcloud firestore databases create --location=asia-east1 --type=firestore-native
+```
 
-    將此專案的程式碼 clone 到您的本地環境，然後在專案根目錄下執行以下指令：
+#### 4. 執行首次部署 (Cloud Run)
+使用 `gcloud run deploy` 直接從原始碼建置並部署。若 Google OAuth 資訊尚未取得，可先使用 `PENDING` 作為佔位符：
 
-    ```bash
-    gcloud run deploy linebot-file-service \
-      --source . \
-      --platform managed \
-      --region asia-east1 \
-      --allow-unauthenticated \
-      --set-env-vars="ChannelSecret=YOUR_CHANNEL_SECRET" \
-      --set-env-vars="ChannelAccessToken=YOUR_CHANNEL_ACCESS_TOKEN" \
-      --set-env-vars="GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID" \
-      --set-env-vars="GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET" \
-      --set-env-vars="GOOGLE_REDIRECT_URL=YOUR_CLOUD_RUN_URL/oauth/callback"
-    ```
-    **參數說明：**
-    *   `linebot-file-service`: 您的 Cloud Run 服務名稱，可自訂。
-    *   `--region`: 建議選擇離您最近的地區，例如 `asia-east1` (台灣)。
-    *   `--allow-unauthenticated`: 允許來自 LINE Platform 的公開請求。
-    *   `YOUR_...`: 請替換成您自己的金鑰和憑證。
-    *   `GOOGLE_REDIRECT_URL`: **此處先隨意填寫一個臨時網址**，例如 `https://temp.com`。
+```bash
+gcloud run deploy bwai2026 \
+  --source . \
+  --region asia-east1 \
+  --set-env-vars "GOOGLE_CLOUD_PROJECT=[YOUR_PROJECT_ID],ChannelSecret=[LINE_SECRET],ChannelAccessToken=[LINE_TOKEN],GOOGLE_CLIENT_ID=PENDING,GOOGLE_CLIENT_SECRET=PENDING,GOOGLE_REDIRECT_URL=PENDING" \
+  --allow-unauthenticated \
+  --quiet
+```
 
-5.  **設定 Webhook 和 Redirect URI**
+#### 5. 更新 Redirect URL 與 OAuth 憑證
+部署完成後取得服務 URL（例如：`https://bwai2026-xxxxx.a.run.app`），接著更新環境變數：
 
-    *   部署完成後，Cloud Run 會提供給您一個服務 **URL** (例如 `https://linebot-file-service-xxxxxxxx-an.a.run.app`)。
-    *   **更新 LINE Webhook**：前往 [LINE Developers Console](https://developers.line.biz/)，在您的 Bot 頻道設定中，將 `Webhook URL` 設為您的 Cloud Run 服務 URL。
-    *   **更新 Google OAuth Redirect URI**：回到步驟 3 的憑證頁面，點擊您建立的 Web application 憑證進行編輯。在 **Authorized redirect URIs** 中，加入 `YOUR_CLOUD_RUN_URL/oauth/callback` (例如 `https://linebot-file-service-xxxxxxxx-an.a.run.app/oauth/callback`)。
-    *   **重新部署 Cloud Run**：執行一次步驟 4 的 `gcloud run deploy` 指令，這次將 `GOOGLE_REDIRECT_URL` 的值更新為**正確的 Cloud Run 回呼網址**。
+```bash
+# 更新 Redirect URL
+gcloud run services update bwai2026 \
+  --region asia-east1 \
+  --update-env-vars "GOOGLE_REDIRECT_URL=https://[YOUR_SERVICE_URL]/oauth/callback"
 
-至此，您的 LINE Bot 已成功部署並在雲端運行！
+# 更新 Google OAuth 憑證 (Client ID 與 Secret)
+gcloud run services update bwai2026 \
+  --region asia-east1 \
+  --update-env-vars "GOOGLE_CLIENT_ID=[YOUR_CLIENT_ID],GOOGLE_CLIENT_SECRET=[YOUR_CLIENT_SECRET]"
+```
+
+### 🛠️ 部署指令速查表 (gcloud)
+| 功能 | 指令 |
+| :--- | :--- |
+| **首次部署** | `gcloud run deploy [SERVICE_NAME] --source .` |
+| **更新環境變數** | `gcloud run services update [SERVICE_NAME] --update-env-vars "KEY=VALUE"` |
+| **查看日誌** | `gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=[SERVICE_NAME]"` |
+
+---
 
 ## 📜 License
 
