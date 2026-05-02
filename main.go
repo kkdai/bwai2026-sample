@@ -531,19 +531,27 @@ func main() {
 						return
 					}
 
+					helpText := "📋 可用指令列表：\n\n" +
+						"/connect_drive - 啟動連接 Google Drive\n" +
+						"/disconnect_drive - 解除連接 Google Drive\n" +
+						"/reconnect - 重新連接 Google Drive\n" +
+						"/recent_files - 查詢最近上傳的 5 個檔案\n" +
+						"/search_files <關鍵字> - 搜尋 Google Drive 中的檔案\n" +
+						"/q <關鍵字> - 同 /search_files\n\n" +
+						"📁 傳送圖片、影片、音訊或檔案，即可自動備份至 Google Drive。"
 					if _, err = bot.ReplyMessage(
 						&messaging_api.ReplyMessageRequest{
 							ReplyToken: e.ReplyToken,
 							Messages: []messaging_api.MessageInterface{
 								&messaging_api.TextMessage{
-									Text: message.Text,
+									Text: helpText,
 								},
 							},
 						},
 					); err != nil {
 						log.Print(err)
 					} else {
-						log.Println("Sent text reply.")
+						log.Println("Sent help message.")
 					}
 				case webhook.StickerMessageContent:
 					replyMessage := fmt.Sprintf(
