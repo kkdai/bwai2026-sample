@@ -545,6 +545,14 @@ func main() {
 							Messages: []messaging_api.MessageInterface{
 								&messaging_api.TextMessage{
 									Text: helpText,
+									QuickReply: &messaging_api.QuickReply{
+										Items: []messaging_api.QuickReplyItem{
+											{Action: &messaging_api.MessageAction{Label: "連接 Drive", Text: "/connect_drive"}},
+											{Action: &messaging_api.MessageAction{Label: "解除連接", Text: "/disconnect_drive"}},
+											{Action: &messaging_api.MessageAction{Label: "重新連接", Text: "/reconnect"}},
+											{Action: &messaging_api.MessageAction{Label: "搜尋檔案", Text: "/search_files "}},
+										},
+									},
 								},
 							},
 						},
