@@ -91,10 +91,15 @@ cd bwai2026-sample
 - 在 Console 中進入該 Channel，點選 **Basic settings** 分頁。
 - 向下捲動到底部即可看到 **Channel secret**。
 
+<img width="677" height="418" alt="image" src="https://github.com/user-attachments/assets/fc36f807-5133-41f1-a24c-3fb2f369d20f" />
+
+
 **Channel Access Token**
 - 點選 **Messaging API** 分頁。
 - 捲動到頁面最下方，找到 **Channel access token**。
 - 點擊「Issue」(發行)，取得產生的字串 (long-lived)。
+
+
 
 ### 4. 關閉自動回應（重要）
 
@@ -106,6 +111,8 @@ cd bwai2026-sample
 4. **進階設定**：
    - 自動回應訊息：**停用**
    - Webhook：**啟用**（部署 Server 後開啟）
+
+<img width="412" height="329" alt="image" src="https://github.com/user-attachments/assets/6f439154-b504-4942-8fcf-21fa8370400b" />
 
 ---
 
