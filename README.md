@@ -147,14 +147,28 @@ Gemini CLI 需要透過 Google OAuth 進行身分驗證，才能代表你操作 
 
 ### 1. 設定 OAuth 同意畫面 (OAuth Consent Screen)
 
+<img width="1162" height="601" alt="image" src="https://github.com/user-attachments/assets/e5ee125e-438c-466d-b1eb-e353cff8ab78" />
+
+
 1. 進入 [Google Cloud Console - OAuth 同意畫面](https://console.cloud.google.com/apis/credentials/consent)。
-2. **User Type**：選擇「外部 (External)」（若為 Workspace 帳號可選內部），點擊「建立」。
-3. 填寫應用程式資訊：
    - **應用程式名稱**：例如 `My LINE Bot`
    - **使用者支援電子郵件**：選擇你的 Gmail
+   
+<img width="620" height="561" alt="Google Chrome 2026-05-14 15 08 47" src="https://github.com/user-attachments/assets/a15ed104-7dff-4344-a1c8-3c85d5cb9c6c" />
+
+2. **User Type**：選擇「外部 (External)」（若為 Workspace 帳號可選內部），點擊「建立」。
+
+<img width="594" height="543" alt="Google Chrome 2026-05-14 15 08 58" src="https://github.com/user-attachments/assets/0bd43ddb-e797-40d9-9004-21840a203d45" />
+
+3. 填寫應用程式資訊：
    - **開發者聯絡資訊**：填入你的電子郵件
+<img width="566" height="493" alt="image" src="https://github.com/user-attachments/assets/5869841a-27ab-4129-a81f-75e77db9e3a2" />
+
 4. 點擊「儲存並繼續」，其餘步驟可直接點擊「儲存並繼續」跳過。
-5. 回到儀表板，點擊「**發布應用程式**」並確認，OAuth 才能正式運作。
+5. 回到儀表板，點擊「**發布應用程式**」並確認，OAuth 才能正式運作。 （記得要點選發佈應用程式)
+
+<img width="612" height="633" alt="Google Chrome 2026-05-14 15 11 35" src="https://github.com/user-attachments/assets/6adb0210-973a-4963-ace9-f806ca958525" />
+
 
 > [!NOTE]
 > 若為測試狀態，需在「測試使用者」中手動加入你自己的 Gmail 帳號，才能完成授權流程。
@@ -166,10 +180,15 @@ Gemini CLI 需要透過 Google OAuth 進行身分驗證，才能代表你操作 
 
 1. 進入 [Google Cloud Console - 憑證 (Credentials)](https://console.cloud.google.com/apis/credentials)。
 2. 點擊「建立憑證」→「OAuth 客戶端 ID」。
+<img width="850" height="334" alt="image" src="https://github.com/user-attachments/assets/541cb65c-4cf5-4712-9ea6-b966988798ef" />
+
 3. **應用程式類型**：選擇「**網頁應用程式 (Web Application)**」。
 4. **名稱**：自訂名稱（例如 `LINE Bot OAuth Client`）。
 5. **已授權的重新導向 URI**：填入 Cloud Run 網址加上 `/oauth/callback`。
    - 範例：`https://bwai2026-xxxxx.a.run.app/oauth/callback`
+<img width="835" height="749" alt="image" src="https://github.com/user-attachments/assets/c3f25709-947d-4dad-9cab-b90ec2fb8c05" />
+
+   
 6. 點擊「建立」，記下 **Client ID** 與 **Client Secret**。
 
 ### 3. 啟用 Google Drive API
