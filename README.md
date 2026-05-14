@@ -60,21 +60,28 @@ cd bwai2026-sample
 
 ### 1. 建立官方帳號
 
-1. 進入 [LINE Business ID 登入頁面](https://account.line.biz/login)。
-2. 存取 [LINE Official Account Manager](https://manager.line.biz/)，選擇「使用 LINE 帳號登入」或「使用商用帳號登入」。
-3. 建立新帳號，填入以下資訊：
+1. 存取 [LINE Official Account Manager](https://manager.line.biz/)，選擇「使用 LINE 帳號登入」或「使用商用帳號登入」。
+2. 建立新帳號，填入以下資訊：
+<img width="289" height="257" alt="image" src="https://github.com/user-attachments/assets/fef68e46-bf42-4465-8434-3715fcea1d99" />
+
    - **帳號名稱**：你的 Bot 名稱
    - **公司/團體名稱**：可填寫個人
    - **業種**：選擇適合的分類
    - **電子郵件信箱**
-4. 確認資料無誤後點擊「送出」。
+3. 確認資料無誤後點擊「送出」。
+4. 點選「稍後進行認證」（前往管理畫面）
 
 ### 2. 啟用 Messaging API
 
 1. 在後台右上角點擊「設定」，左側選單點選「Messaging API」。
 2. 點擊「啟用 Messaging API」。
+<img width="1366" height="388" alt="image" src="https://github.com/user-attachments/assets/fbae7424-41ab-4f4c-87e8-d3aa9493f777" />
 3. 選擇/建立服務提供者 (Provider)：輸入開發商名稱。
 4. 完成後，帳號即與 [LINE Developers Console](https://developers.line.biz/console/) 連結。
+5. 選擇「回應設定」將「自動回應訊息」關閉
+<img width="1185" height="645" alt="image" src="https://github.com/user-attachments/assets/37cb5c2a-0a91-4c3b-b9e4-3171ba8f3373" />
+
+
 
 ### 3. 取得開發金鑰
 
