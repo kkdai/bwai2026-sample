@@ -230,14 +230,6 @@ gemini
 在對話框中輸入：
 
 ```
-請幫我將這個專案部署到 Cloud Run，區域選擇 asia-east1，
-並設定環境變數 LINE_CHANNEL_SECRET 與 LINE_CHANNEL_ACCESS_TOKEN。
-如果需要任何資料，請停下來問我。
-```
-
-或是直接提供完整資訊：
-
-```
 幫我使用 gcloud 部署到 Cloud Run，如果需要任何資料，請停下來問我。
 參考 repo https://github.com/kkdai/bwai2026-sample
 ```
